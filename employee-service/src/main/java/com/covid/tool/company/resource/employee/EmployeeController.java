@@ -47,6 +47,12 @@ public class EmployeeController {
 	@RequestMapping(value = "/companies/{CompanyId}/employees", produces = MediaType.APPLICATION_JSON_VALUE)
 	public EmployeeList getAllEmployees(@PathVariable String CompanyId)
 	{
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		EmployeeList empList = new EmployeeList();
 		empList.setEmpList(employeeService.getAllEmployees(CompanyId));
 		return empList;

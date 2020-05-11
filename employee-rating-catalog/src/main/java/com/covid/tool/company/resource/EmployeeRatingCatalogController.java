@@ -1,6 +1,7 @@
 package com.covid.tool.company.resource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -15,7 +16,8 @@ import com.covid.tool.company.model.Employee;
 import com.covid.tool.company.model.EmployeeList;
 import com.covid.tool.company.model.EmployeeRating;
 import com.covid.tool.company.model.Rating;
-import com.covid.tool.company.service.EmployeeCatalogService;
+import com.covid.tool.company.service.EmployeeRatingCatalogService;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
 import ch.qos.logback.classic.Logger;
 
@@ -36,6 +38,7 @@ public class EmployeeRatingCatalogController {
 	
 	// Remember there is a Class level request mapping also out here.
 	@RequestMapping("/catalog/companies/{companyId}/employeeratings")
+	@HystrixCommand(fallbackMethod = "fallBackEmployeeRating")
 	public List<EmployeeRating> getEmployeesRating(@PathVariable String companyId) {
 		
 		EmployeeList emplist = restTemplate.getForObject("http://EMPLOYEE-SERVICE/companies/"+companyId+"/employees", EmployeeList.class);
@@ -52,5 +55,10 @@ public class EmployeeRatingCatalogController {
 			logger.info(employeeRatings.toString());
 		}
 		return employeeRatings;
+	}
+	
+	public List<EmployeeRating> fallBackEmployeeRating(@PathVariable String companyId){
+		return Arrays.asList(
+				new EmployeeRating(new Employee("0","Timeout Artificial Response", 100000, "Hexaware"), new Rating("0", 5)));
 	}
 }
